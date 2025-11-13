@@ -1,0 +1,23 @@
+spring:
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  datasource:
+    url: jdbc:h2:file:./pruebadb
+    username: sa
+    password:
+    driverClassName: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  sql:
+    init:
+      mode: always
+
+jwt:
+  secret: ${JWT_SECRET:YjVlNDY4YTZlN2E5NGM5ZWE4MDY3ZGY1YjM4MGE3YjU3YzZjM2Y1YTQ1N2IyM2U2ZDIxY2EwZjYxMjljMWMwYg==}
+  expiration: 3600000
