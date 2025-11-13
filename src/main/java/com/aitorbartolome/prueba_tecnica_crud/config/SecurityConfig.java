@@ -1,6 +1,7 @@
 package com.aitorbartolome.prueba_tecnica_crud.config;
 
 import com.aitorbartolome.prueba_tecnica_crud.repository.UserRepository;
+import com.aitorbartolome.prueba_tecnica_crud.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.ArrayList;
 
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final JwtAuthenticationFilter jwtAuthFilter;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -48,17 +51,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
-
                 .authorizeHttpRequests(auth -> auth
-                        // 3. Endpoints Públicos (Whitelist)
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )
-
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                );
+                )
+
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
