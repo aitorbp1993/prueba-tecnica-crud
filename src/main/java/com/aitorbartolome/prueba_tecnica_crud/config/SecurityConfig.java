@@ -5,15 +5,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@Configuration // Le dice a Spring que esta clase contiene configuraciones (Beans)
+@Configuration
 public class SecurityConfig {
 
-    /**
-     * Define un Bean de PasswordEncoder.
-     * Usamos BCrypt, que es el estándar de la industria para hashear contraseñas.
-     * Este Bean estará disponible en toda la aplicación para ser inyectado.
-     */
-    @Bean // Le dice a Spring que este método crea un objeto que debe gestionar
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
