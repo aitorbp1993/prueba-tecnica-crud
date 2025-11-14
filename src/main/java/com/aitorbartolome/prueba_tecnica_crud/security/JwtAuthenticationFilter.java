@@ -33,34 +33,47 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            // 1. No hay token. Deja pasar la petición.
+            // (La regla .permitAll() de Swagger funcionará aquí)
             filterChain.doFilter(request, response);
             return;
         }
 
-        final String jwt = authHeader.substring(7);
+        // --- ¡AQUÍ ESTÁ LA SOLUCIÓN! ---
+        try {
+            final String jwt = authHeader.substring(7);
+            final String username = jwtService.extractUsername(jwt);
 
-        final String username = jwtService.extractUsername(jwt);
+            // Si tenemos username Y el usuario no está ya autenticado...
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
-            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
-
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                // Si el token es válido...
+                if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+                    // Autenticamos al usuario
+                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                            userDetails,
+                            null,
+                            userDetails.getAuthorities()
+                    );
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
-        }
 
+        } catch (Exception e) {
+            // --- ¡EL CAMBIO CLAVE! ---
+            // Capturamos CUALQUIER excepción (JwtException, UsernameNotFoundException, etc.)
+            // No hacemos nada con ella, simplemente evitamos que el filtro se rompa.
+            // Al no autenticar al usuario, la petición continúa "como anónima"
+            // y la regla .permitAll() de Swagger podrá (¡por fin!) hacer su trabajo.
+        }
+        // --- FIN DE LA SOLUCIÓN ---
+
+        // 2. Deja pasar la petición (autenticada o no) al siguiente filtro
         filterChain.doFilter(request, response);
     }
 }
