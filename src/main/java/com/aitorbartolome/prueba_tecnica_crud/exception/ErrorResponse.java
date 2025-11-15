@@ -1,11 +1,11 @@
 package com.aitorbartolome.prueba_tecnica_crud.exception;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Detailed error response following option B format
@@ -16,8 +16,7 @@ import java.time.Instant;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-    private Instant timestamp;
+    private String timestamp;  // Changed from Instant to String
 
     private int status;
 
@@ -36,7 +35,7 @@ public class ErrorResponse {
      */
     public static ErrorResponse of(int status, ErrorCode errorCode, String message, String path) {
         return ErrorResponse.builder()
-                .timestamp(Instant.now())
+                .timestamp(Instant.now().toString())  // Convert to String
                 .status(status)
                 .error(errorCode.name())
                 .message(message != null ? message : errorCode.getDescription())
@@ -50,7 +49,7 @@ public class ErrorResponse {
      */
     public static ErrorResponse of(int status, ErrorCode errorCode, String message, String path, String details) {
         return ErrorResponse.builder()
-                .timestamp(Instant.now())
+                .timestamp(Instant.now().toString())  // Convert to String
                 .status(status)
                 .error(errorCode.name())
                 .message(message != null ? message : errorCode.getDescription())
