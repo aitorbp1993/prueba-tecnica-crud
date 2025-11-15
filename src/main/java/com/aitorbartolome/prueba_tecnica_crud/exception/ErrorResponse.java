@@ -5,18 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 
 /**
- * Detailed error response following option B format
- * Returns timestamp (Z format), status, error type, message, path, and error code
+ * The type Error response.
  */
 @Data
 @Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse {
 
-    private String timestamp;  // Changed from Instant to String
+    private String timestamp;
 
     private int status;
 
@@ -31,11 +29,17 @@ public class ErrorResponse {
     private String details;
 
     /**
-     * Factory method to create error response from ErrorCode
+     * Of error response.
+     *
+     * @param status    the status
+     * @param errorCode the error code
+     * @param message   the message
+     * @param path      the path
+     * @return the error response
      */
     public static ErrorResponse of(int status, ErrorCode errorCode, String message, String path) {
         return ErrorResponse.builder()
-                .timestamp(Instant.now().toString())  // Convert to String
+                .timestamp(Instant.now().toString())
                 .status(status)
                 .error(errorCode.name())
                 .message(message != null ? message : errorCode.getDescription())
@@ -46,10 +50,17 @@ public class ErrorResponse {
 
     /**
      * Factory method with additional details
+     *
+     * @param status    the status
+     * @param errorCode the error code
+     * @param message   the message
+     * @param path      the path
+     * @param details   the details
+     * @return the error response
      */
     public static ErrorResponse of(int status, ErrorCode errorCode, String message, String path, String details) {
         return ErrorResponse.builder()
-                .timestamp(Instant.now().toString())  // Convert to String
+                .timestamp(Instant.now().toString())
                 .status(status)
                 .error(errorCode.name())
                 .message(message != null ? message : errorCode.getDescription())

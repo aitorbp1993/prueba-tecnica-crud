@@ -6,15 +6,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Validador adicional de JWT
- * Valida aspectos específicos del token más allá de la estructura
+ * The type Jwt validator.
  */
 @Slf4j
 @Component
 public class JwtValidator {
 
     /**
-     * Valida que el token tenga el formato Bearer correcto
+     * Extract bearer token string.
+     *
+     * @param authHeader the auth header
+     * @return the string
      */
     public String extractBearerToken(String authHeader) {
         if (authHeader == null || authHeader.isEmpty()) {
@@ -31,7 +33,10 @@ public class JwtValidator {
     }
 
     /**
-     * Valida que el token tenga roles
+     * Validate token has roles.
+     *
+     * @param token       the token
+     * @param jwtProvider the jwt provider
      */
     public void validateTokenHasRoles(String token, JwtProvider jwtProvider) {
         var roles = jwtProvider.extractRoles(token);

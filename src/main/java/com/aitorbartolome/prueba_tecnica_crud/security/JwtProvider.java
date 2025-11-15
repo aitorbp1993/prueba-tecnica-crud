@@ -14,8 +14,7 @@ import java.util.*;
 import java.util.function.Function;
 
 /**
- * Proveedor de tokens JWT
- * Maneja la generación y extracción de información de tokens JWT
+ * The type Jwt provider.
  */
 @Slf4j
 @Service
@@ -31,7 +30,13 @@ public class JwtProvider {
     private long refreshExpiration;
 
     /**
-     * Genera un token JWT de acceso
+     * Generate access token string.
+     *
+     * @param username the username
+     * @param userId   the user id
+     * @param email    the email
+     * @param roles    the roles
+     * @return the string
      */
     public String generateAccessToken(String username, UUID userId, String email, List<String> roles) {
         Map<String, Object> claims = new HashMap<>();
@@ -44,7 +49,11 @@ public class JwtProvider {
     }
 
     /**
-     * Genera un token JWT de refresco
+     * Generate refresh token string.
+     *
+     * @param username the username
+     * @param userId   the user id
+     * @return the string
      */
     public String generateRefreshToken(String username, UUID userId) {
         Map<String, Object> claims = new HashMap<>();
@@ -54,9 +63,6 @@ public class JwtProvider {
         return generateToken(claims, username, refreshExpiration);
     }
 
-    /**
-     * Genera un token JWT con claims personalizados
-     */
     private String generateToken(Map<String, Object> claims, String username, long expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);
@@ -74,14 +80,20 @@ public class JwtProvider {
     }
 
     /**
-     * Extrae el nombre de usuario del token
+     * Extract username string.
+     *
+     * @param token the token
+     * @return the string
      */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
     /**
-     * Extrae el UUID del usuario del token
+     * Extract user id uuid.
+     *
+     * @param token the token
+     * @return the uuid
      */
     public UUID extractUserId(String token) {
         String userId = extractClaim(token, claims -> (String) claims.get(JwtConstants.CLAIM_USER_ID));
@@ -95,6 +107,9 @@ public class JwtProvider {
 
     /**
      * Extrae los roles del token
+     *
+     * @param token the token
+     * @return the list
      */
     @SuppressWarnings("unchecked")
     public List<String> extractRoles(String token) {
@@ -104,6 +119,10 @@ public class JwtProvider {
 
     /**
      * Valida si el token es válido para un username específico
+     *
+     * @param token    the token
+     * @param username the username
+     * @return the boolean
      */
     public boolean isTokenValid(String token, String username) {
         try {
@@ -121,6 +140,10 @@ public class JwtProvider {
 
     /**
      * Valida si el refresh token es válido
+     *
+     * @param token    the token
+     * @param username the username
+     * @return the boolean
      */
     public boolean isRefreshTokenValid(String token, String username) {
         try {
@@ -138,6 +161,8 @@ public class JwtProvider {
 
     /**
      * Valida la estructura y firma del token
+     *
+     * @param token the token
      */
     public void validateTokenStructure(String token) {
         try {

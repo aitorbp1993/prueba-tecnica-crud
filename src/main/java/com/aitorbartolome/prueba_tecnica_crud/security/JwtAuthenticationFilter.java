@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Filtro de autenticación JWT
- * Valida y procesa los tokens JWT en cada petición
+ * The type Jwt authentication filter.
  */
 @Slf4j
 @Component
@@ -46,7 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader(JwtConstants.AUTHORIZATION_HEADER);
 
-        // Si no hay header de autorización, deja pasar
         if (authHeader == null || authHeader.isEmpty()) {
             log.debug("No hay header de autorización");
             filterChain.doFilter(request, response);
@@ -54,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
-            // Extrae el token del header
             String jwt = jwtValidator.extractBearerToken(authHeader);
 
             if (jwt == null || jwt.isEmpty()) {
@@ -63,27 +60,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // Valida la estructura del token
             jwtProvider.validateTokenStructure(jwt);
 
-            // Extrae el username del token
             String username = jwtProvider.extractUsername(jwt);
 
-            // Si el usuario aún no está autenticado
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 try {
-                    // Carga los detalles del usuario
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                    // Valida que el token sea válido para este usuario
                     if (jwtProvider.isTokenValid(jwt, username)) {
-                        // Extrae los roles del token
                         List<String> roles = jwtProvider.extractRoles(jwt);
                         List<GrantedAuthority> authorities = roles.stream()
                                 .map(SimpleGrantedAuthority::new)
                                 .collect(Collectors.toList());
 
-                        // Crea el token de autenticación
                         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                                 userDetails,
                                 null,
@@ -93,7 +83,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                 new WebAuthenticationDetailsSource().buildDetails(request)
                         );
 
-                        // Establece la autenticación en el contexto
                         SecurityContextHolder.getContext().setAuthentication(authToken);
                         log.debug("Usuario autenticado: {} con roles: {}", username, roles);
                     } else {
@@ -102,20 +91,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 } catch (UsernameNotFoundException e) {
                     log.warn("Usuario no encontrado: {}", username);
-                    // El usuario no existe, se permite continuar sin autenticar
                 }
             }
 
         } catch (JwtException e) {
             log.warn("Error de validación JWT: {} - {}", e.getErrorCode(), e.getMessage());
-            // Las excepciones JWT se capturan pero no rompemos el flujo
-            // La autenticación simplemente no se establece
         } catch (Exception e) {
             log.error("Error inesperado en el filtro JWT", e);
-            // Cualquier otro error también se captura para no romper el flujo
         }
 
-        // Continúa con el siguiente filtro
         filterChain.doFilter(request, response);
     }
 }

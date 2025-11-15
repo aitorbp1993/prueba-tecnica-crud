@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 /**
- * Response DTO for successful delete operations
+ * The type Delete response.
  */
 @Data
 @NoArgsConstructor
@@ -21,6 +21,12 @@ public class DeleteResponse {
     private UUID id;
     private long timestamp;
 
+    /**
+     * Instantiates a new Delete response.
+     *
+     * @param message the message
+     * @param id      the id
+     */
     public DeleteResponse(String message, UUID id) {
         this.message = message;
         this.id = id;

@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * DTO de respuesta de login
- * Contiene los tokens de acceso y refresco
+ * The type Login response dto.
  */
 @Data
 @NoArgsConstructor
@@ -24,9 +23,14 @@ public class LoginResponseDTO {
     private String tokenType = "Bearer";
 
     @JsonProperty("expires_in")
-    private long expiresIn = 3600; // 1 hora en segundos
+    private long expiresIn = 3600;
 
-    // Constructor con los dos tokens
+    /**
+     * Instantiates a new Login response dto.
+     *
+     * @param accessToken  the access token
+     * @param refreshToken the refresh token
+     */
     public LoginResponseDTO(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -34,7 +38,11 @@ public class LoginResponseDTO {
         this.expiresIn = 3600;
     }
 
-    // Constructor de compatibilidad anterior (solo accessToken)
+    /**
+     * Instantiates a new Login response dto.
+     *
+     * @param accessToken the access token
+     */
     public LoginResponseDTO(String accessToken) {
         this.accessToken = accessToken;
         this.tokenType = "Bearer";
