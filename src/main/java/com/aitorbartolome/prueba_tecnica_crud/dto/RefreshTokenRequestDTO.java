@@ -6,16 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Login request DTO with validation
+ * Refresh token request DTO
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginRequestDTO {
+public class RefreshTokenRequestDTO {
 
-    @NotBlank(message = "Username cannot be blank")
-    private String username;
-
-    @NotBlank(message = "Password cannot be blank")
-    private String password;
+    @NotBlank(message = "Refresh token cannot be blank")
+    private String refreshToken;
 }

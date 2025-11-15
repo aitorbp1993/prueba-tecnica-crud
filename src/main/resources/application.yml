@@ -21,3 +21,13 @@ spring:
 jwt:
   secret: ${JWT_SECRET:YjVlNDY4YTZlN2E5NGM5ZWE4MDY3ZGY1YjM4MGE3YjU3YzZjM2Y1YTQ1N2IyM2U2ZDIxY2EwZjYxMjljMWMwYg==}
   expiration: 3600000
+  refresh-expiration: 604800000
+
+logging:
+  level:
+    root: INFO
+    org.springframework: DEBUG
+    org.springframework.security: DEBUG
+    com.aitorbartolome.prueba_tecnica_crud: DEBUG
+    com.aitorbartolome.prueba_tecnica_crud.security: DEBUG
+    org.hibernate.SQL: DEBUG
