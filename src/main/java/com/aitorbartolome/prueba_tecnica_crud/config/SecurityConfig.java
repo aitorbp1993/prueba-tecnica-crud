@@ -7,13 +7,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-// ¡¡Este import es NUEVO y CLAVE!!
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
 
 @Configuration
 @EnableWebSecurity
@@ -22,46 +19,58 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
 
+    // ✅ RUTAS PÚBLICAS (No requieren autenticación)
+    private static final String[] PUBLIC_ENDPOINTS = {
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/swagger-resources/**",
+            "/webjars/**",
+            "/h2-console/**"
+    };
+
     /**
-     * BEAN 1: El Cortafuegos (LA SOLUCIÓN AL 403)
-     *
-     * Aquí le decimos a Spring Security que IGNORE por completo estas rutas.
-     * No se ejecutará ningún filtro (ni JWT, ni CSRF) sobre ellas.
-     * Es la forma correcta de exponer assets estáticos y consolas de BBDD.
+     * ✅ SOLUCIÓN: Ignorar completamente las rutas de Swagger y H2
+     * Esto hace que Spring Security NO las procese en absoluto
      */
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring()
-                .requestMatchers("/v3/api-docs/**")
-                .requestMatchers("/swagger-ui/**")
-                .requestMatchers(toH2Console());
+                .requestMatchers(PUBLIC_ENDPOINTS);
     }
 
     /**
-     * BEAN 2: La Cadena de Filtros (Solo para la API)
-     *
-     * Esta cadena SÍ ejecutará los filtros (como JwtAuthenticationFilter)
-     * pero solo para las rutas que NO estén en la lista "ignoring".
+     * ✅ SOLUCIÓN: Desactivar el AnonymousAuthenticationFilter para rutas sin token
+     * Esto evita que Spring intente rechazar las peticiones anónimas
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Deshabilita CSRF
+                .csrf(csrf -> csrf.disable())
 
+                // ✅ Permitir frames para H2 Console
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.sameOrigin())
+                )
 
                 .authorizeHttpRequests(auth -> auth
-                        // Reglas de la API
+                        // Rutas públicas (API)
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
 
-                        // (Hemos quitado Swagger y H2 de aquí, ya están en el 'ignoring')
+                        // ✅ IMPORTANTE: Permitir acceso anónimo a rutas sin token
+                        .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
 
-                        // Todo lo demás, protegido
+                        // Todo lo demás requiere autenticación
                         .anyRequest().authenticated()
                 )
+
+                // ✅ CONFIGURACIÓN STATELESS para JWT
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+
+                // ✅ Agregar el filtro JWT ANTES del filtro de autenticación estándar
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
