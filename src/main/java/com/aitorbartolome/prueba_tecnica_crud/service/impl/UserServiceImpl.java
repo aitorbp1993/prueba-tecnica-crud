@@ -9,7 +9,7 @@ import com.aitorbartolome.prueba_tecnica_crud.exception.ResourceNotFoundExceptio
 import com.aitorbartolome.prueba_tecnica_crud.mapper.UserMapper;
 import com.aitorbartolome.prueba_tecnica_crud.repository.UserRepository;
 import com.aitorbartolome.prueba_tecnica_crud.service.UserService;
-import com.aitorbartolome.prueba_tecnica_crud.validation.PasswordValidator;
+import com.aitorbartolome.prueba_tecnica_crud.exception.PasswordValidator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * The type User service.
+ */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -30,10 +33,9 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public UserResponseDTO createUser(UserCreateRequestDTO userCreateDTO) {
-        // Validate password strength
+
         passwordValidator.validate(userCreateDTO.getPassword());
 
-        // Check for duplicate username
         if (userRepository.existsByUsername(userCreateDTO.getUsername())) {
             throw new DuplicateResourceException(
                     "Username '" + userCreateDTO.getUsername() + "' already exists",
@@ -41,7 +43,6 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-        // Check for duplicate email
         if (userRepository.existsByEmail(userCreateDTO.getEmail())) {
             throw new DuplicateResourceException(
                     "Email '" + userCreateDTO.getEmail() + "' is already registered",
@@ -49,10 +50,8 @@ public class UserServiceImpl implements UserService {
             );
         }
 
-        // Encode password
         String encodedPassword = passwordEncoder.encode(userCreateDTO.getPassword());
 
-        // Create and save user
         User userToCreate = userMapper.toUser(userCreateDTO);
         userToCreate.setPassword(encodedPassword);
 

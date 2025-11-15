@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Refresh token request DTO
+ * The type Refresh token request dto.
  */
 @Data
 @NoArgsConstructor

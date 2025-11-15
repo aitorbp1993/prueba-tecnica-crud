@@ -37,6 +37,9 @@ public class UserController {
     /**
      * Create a new user
      * This endpoint is public and does not require authentication
+     *
+     * @param userCreateDTO the user create dto
+     * @return the response entity
      */
     @Operation(
             summary = "Create a new user",
@@ -85,6 +88,8 @@ public class UserController {
     /**
      * Get all users
      * This endpoint requires JWT authentication
+     *
+     * @return the all users
      */
     @Operation(
             summary = "Get all users",
@@ -133,6 +138,9 @@ public class UserController {
     /**
      * Get a user by ID
      * This endpoint requires JWT authentication
+     *
+     * @param id the id
+     * @return the user by id
      */
     @Operation(
             summary = "Get user by ID",
@@ -185,8 +193,10 @@ public class UserController {
     }
 
     /**
-     * Delete a user by ID
-     * This endpoint requires JWT authentication
+     * Delete user response entity.
+     *
+     * @param id the id
+     * @return the response entity
      */
     @Operation(
             summary = "Delete a user",

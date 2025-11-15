@@ -16,9 +16,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 /**
- * Custom JWT Access Denied Handler
- * Handles authorization errors when an authenticated user lacks sufficient permissions
- * Converts Spring Security 403 errors into our standardized ErrorResponse format
+ * The type Jwt access denied handler.
  */
 @Slf4j
 @Component
@@ -34,11 +32,9 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
         log.warn("Access denied for request to {}: {}", request.getRequestURI(), accessDeniedException.getMessage());
 
-        // Set response content type and status
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
-        // Create standardized error response
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(Instant.now().toString())
                 .status(HttpServletResponse.SC_FORBIDDEN)
@@ -49,7 +45,6 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
                 .details("Ensure your JWT token is valid and has not expired")
                 .build();
 
-        // Write response
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         response.getWriter().flush();
     }

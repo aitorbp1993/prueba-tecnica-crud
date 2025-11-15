@@ -1,4 +1,4 @@
-package com.aitorbartolome.prueba_tecnica_crud.validation;
+package com.aitorbartolome.prueba_tecnica_crud.exception;
 
 import com.aitorbartolome.prueba_tecnica_crud.exception.BadRequestException;
 import com.aitorbartolome.prueba_tecnica_crud.exception.ErrorCode;
@@ -20,6 +20,11 @@ public class PasswordValidator {
     private static final String DIGIT_REGEX = ".*\\d.*";
     private static final String SPECIAL_CHAR_REGEX = ".*[!@#$%^&*()_+\\-=\\[\\]{};:'\",.<>?/\\\\|`~].*";
 
+    /**
+     * Validate.
+     *
+     * @param password the password
+     */
     public void validate(String password) {
         if (password == null || password.isEmpty()) {
             throw new BadRequestException(

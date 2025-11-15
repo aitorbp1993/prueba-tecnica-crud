@@ -10,8 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * User creation request DTO with comprehensive validation
- * Validates username, email, and password requirements
+ * The type User create request dto.
  */
 @Data
 @NoArgsConstructor
@@ -32,6 +31,4 @@ public class UserCreateRequestDTO {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
-    // Note: Additional password validation (uppercase, digit, special char)
-    // is handled by PasswordValidator in the service layer
 }

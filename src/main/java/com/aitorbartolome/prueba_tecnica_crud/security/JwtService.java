@@ -11,6 +11,9 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
 
+/**
+ * The type Jwt service.
+ */
 @Service
 public class JwtService {
 
@@ -20,6 +23,12 @@ public class JwtService {
     @Value("${jwt.expiration}")
     private long jwtExpiration;
 
+    /**
+     * Generate token string.
+     *
+     * @param username the username
+     * @return the string
+     */
     public String generateToken(String username) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpiration);
@@ -32,10 +41,23 @@ public class JwtService {
                 .compact();
     }
 
+    /**
+     * Extract username string.
+     *
+     * @param token the token
+     * @return the string
+     */
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
+    /**
+     * Is token valid boolean.
+     *
+     * @param token    the token
+     * @param username the username
+     * @return the boolean
+     */
     public boolean isTokenValid(String token, String username) {
         final String usernameFromToken = extractUsername(token);
         return (usernameFromToken.equals(username) && !isTokenExpired(token));

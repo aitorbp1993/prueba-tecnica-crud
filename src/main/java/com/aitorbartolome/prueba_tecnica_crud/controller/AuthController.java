@@ -35,8 +35,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Authentication REST Controller
- * Handles user login, token generation, and token refresh operations
+ * The type Auth controller.
  */
 @Slf4j
 @RestController
@@ -50,8 +49,10 @@ public class AuthController {
     private final UserRepository userRepository;
 
     /**
-     * Authenticate user and generate JWT tokens
-     * This endpoint is public and does not require authentication
+     * Login response entity.
+     *
+     * @param request the request
+     * @return the response entity
      */
     @Operation(
             summary = "User Login",
@@ -97,21 +98,18 @@ public class AuthController {
                     )
             );
 
-            // Get user from database
             User user = userRepository.findByUsername(request.getUsername())
                     .orElseThrow(() -> {
                         log.warn("User not found: {}", request.getUsername());
                         return new UsernameNotFoundException("User not found");
                     });
 
-            // Extract roles from authentication
             List<String> roles = authentication.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toList());
 
             log.debug("User roles: {}", roles);
 
-            // Generate access token
             String accessToken = jwtProvider.generateAccessToken(
                     user.getUsername(),
                     user.getId(),
@@ -119,7 +117,6 @@ public class AuthController {
                     roles
             );
 
-            // Generate refresh token
             String refreshToken = jwtProvider.generateRefreshToken(
                     user.getUsername(),
                     user.getId()
@@ -147,8 +144,10 @@ public class AuthController {
     }
 
     /**
-     * Refresh JWT access token using refresh token
-     * This endpoint is public but requires a valid refresh token
+     * Refresh token response entity.
+     *
+     * @param request the request
+     * @return the response entity
      */
     @Operation(
             summary = "Refresh Access Token",
@@ -187,22 +186,18 @@ public class AuthController {
         log.info("Token refresh attempt");
 
         try {
-            // Validate token structure and signature
             jwtProvider.validateTokenStructure(request.getRefreshToken());
             log.debug("Refresh token structure validated");
 
-            // Extract username from token
             String username = jwtProvider.extractUsername(request.getRefreshToken());
             log.debug("Username extracted from refresh token: {}", username);
 
-            // Get user from database
             User user = userRepository.findByUsername(username)
                     .orElseThrow(() -> {
                         log.warn("User not found during token refresh: {}", username);
                         return new UsernameNotFoundException("User not found");
                     });
 
-            // Validate that it's actually a refresh token and not expired
             if (!jwtProvider.isRefreshTokenValid(request.getRefreshToken(), username)) {
                 log.warn("Invalid refresh token for user: {}", username);
                 throw new InvalidTokenException(
@@ -211,7 +206,6 @@ public class AuthController {
                 );
             }
 
-            // Generate new tokens
             List<String> roles = List.of("ROLE_USER");
 
             String newAccessToken = jwtProvider.generateAccessToken(

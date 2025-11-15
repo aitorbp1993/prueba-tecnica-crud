@@ -8,18 +8,32 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * Repositorio para la entidad User.
- * Al extender JpaRepository, Spring Data JPA nos proporciona automáticamente
- * métodos CRUD básicos (save, findById, findAll, delete, etc.).
+ * The interface User repository.
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-    // Spring Data JPA entenderá este método y buscará un usuario por su username
+    /**
+     * Find by username optional.
+     *
+     * @param username the username
+     * @return the optional
+     */
     Optional<User> findByUsername(String username);
 
-    // Métodos optimizados que solo devuelven true/false
+    /**
+     * Exists by username boolean.
+     *
+     * @param username the username
+     * @return the boolean
+     */
     boolean existsByUsername(String username);
 
+    /**
+     * Exists by email boolean.
+     *
+     * @param email the email
+     * @return the boolean
+     */
     boolean existsByEmail(String email);
 }

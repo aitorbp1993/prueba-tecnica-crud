@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -16,6 +15,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Collections;
 
+/**
+ * The type Application config.
+ */
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
@@ -23,8 +25,9 @@ public class ApplicationConfig {
     private final UserRepository userRepository;
 
     /**
-     * Servicio de detalles de usuario
-     * Carga el usuario desde la base de datos con sus roles
+     * User details service user details service.
+     *
+     * @return the user details service
      */
     @Bean
     public UserDetailsService userDetailsService() {
@@ -47,8 +50,11 @@ public class ApplicationConfig {
     }
 
     /**
-     * Gestor de autenticación
-     * Encargado de autenticar las credenciales del usuario
+     * Authentication manager authentication manager.
+     *
+     * @param config the config
+     * @return the authentication manager
+     * @throws Exception the exception
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -56,8 +62,9 @@ public class ApplicationConfig {
     }
 
     /**
-     * Codificador de contraseñas BCrypt
-     * Usado para hashear y verificar contraseñas
+     * Password encoder password encoder.
+     *
+     * @return the password encoder
      */
     @Bean
     public PasswordEncoder passwordEncoder() {

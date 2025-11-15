@@ -16,9 +16,7 @@ import java.io.IOException;
 import java.time.Instant;
 
 /**
- * Custom JWT Authentication Entry Point
- * Handles authentication errors when a request to a protected resource is made without proper authentication
- * Converts Spring Security 401 errors into our standardized ErrorResponse format
+ * The type Jwt authentication entry point.
  */
 @Slf4j
 @Component
@@ -34,11 +32,9 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
         log.warn("Authentication failed for request to {}: {}", request.getRequestURI(), authException.getMessage());
 
-        // Set response content type and status
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        // Create standardized error response
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(Instant.now().toString())
                 .status(HttpServletResponse.SC_UNAUTHORIZED)
@@ -49,7 +45,6 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
                 .details("Please provide a valid Bearer token in the Authorization header")
                 .build();
 
-        // Write response
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
         response.getWriter().flush();
     }
