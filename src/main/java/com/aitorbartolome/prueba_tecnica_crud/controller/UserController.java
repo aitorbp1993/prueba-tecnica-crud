@@ -1,5 +1,6 @@
 package com.aitorbartolome.prueba_tecnica_crud.controller;
 
+import com.aitorbartolome.prueba_tecnica_crud.dto.DeleteResponse;
 import com.aitorbartolome.prueba_tecnica_crud.dto.UserCreateRequestDTO;
 import com.aitorbartolome.prueba_tecnica_crud.dto.UserResponseDTO;
 import com.aitorbartolome.prueba_tecnica_crud.service.UserService;
@@ -189,13 +190,16 @@ public class UserController {
      */
     @Operation(
             summary = "Delete a user",
-            description = "Delete a user from the system by their UUID. Requires valid JWT token. Returns 204 No Content on success."
+            description = "Delete a user from the system by their UUID. Requires valid JWT token. Returns confirmation message on success."
     )
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "204",
+                    responseCode = "200",
                     description = "User deleted successfully",
-                    content = @Content()
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = DeleteResponse.class)
+                    )
             ),
             @ApiResponse(
                     responseCode = "401",
@@ -220,14 +224,16 @@ public class UserController {
     })
     @SecurityRequirement(name = "bearerAuth")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(
+    public ResponseEntity<DeleteResponse> deleteUser(
             @PathVariable(name = "id") UUID id) {
         log.info("Deleting user with id: {}", id);
 
         try {
             userService.deleteUser(id);
             log.info("User deleted successfully with id: {}", id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+            DeleteResponse response = new DeleteResponse("User deleted successfully", id);
+            return ResponseEntity.ok(response);
         } catch (Exception ex) {
             log.error("Error deleting user with id {}: {}", id, ex.getMessage());
             throw ex;
