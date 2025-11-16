@@ -184,7 +184,6 @@ Base URL por defecto: http://localhost:8080
       "access_token": "nuevo_access_token...",
       "token_type": "Bearer",
       "expires_in": 3600
-      // opcional: "refresh_token": "nuevo_refresh_token..." 
     }
     ```
   - Ejemplo:
@@ -367,4 +366,3 @@ Colección de Postman:
      Los scripts de la colección guardan automáticamente `access_token` y `refresh_token`.  
      Cuando el access token caduque, usa “Auth - Refresh” para obtener uno nuevo.
 
-```
