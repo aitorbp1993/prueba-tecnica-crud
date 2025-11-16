@@ -34,7 +34,14 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime creationDate;
+
+    @PrePersist
+    protected void onCreate() {
+        // Solo asignar si está null
+        if (this.creationDate == null) {
+            this.creationDate = LocalDateTime.now();
+        }
+    }
 }
